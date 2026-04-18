@@ -1,10 +1,8 @@
 import { Reveal } from "@/components/motion/reveal";
 import { Section } from "@/components/ui/section";
-import { experience } from "@/content/experience";
+import type { ExperienceRoleDTO } from "@/lib/page-types";
 
-export function Experience() {
-  const role = experience[0];
-
+export function Experience({ role }: { role: ExperienceRoleDTO }) {
   return (
     <Section
       id="experience"
@@ -29,7 +27,7 @@ export function Experience() {
           </header>
           <ul className="mt-8 space-y-10">
             {role.highlights.map((h, idx) => (
-              <li key={h.title} className="relative pl-6">
+              <li key={`${h.title}-${idx}`} className="relative pl-6">
                 <span
                   aria-hidden
                   className="absolute left-0 top-2 h-2 w-2 rounded-full bg-emerald-500/80"
@@ -40,7 +38,7 @@ export function Experience() {
                 <p className="mt-2 text-sm leading-relaxed text-zinc-400">
                   {h.detail}
                 </p>
-                {h.metrics ? (
+                {h.metrics.length > 0 ? (
                   <ul className="mt-3 flex flex-wrap gap-2">
                     {h.metrics.map((m) => (
                       <li

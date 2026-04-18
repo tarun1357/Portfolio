@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { site } from "@/content/site";
+import { getPageData } from "@/lib/page-data";
 import { getMetadataBase } from "@/lib/site-url";
 
 import "./globals.css";
@@ -24,50 +24,56 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export const metadata: Metadata = {
-  metadataBase: getMetadataBase(),
-  title: {
-    default: `${site.name} — ${site.focus}`,
-    template: `%s — ${site.name}`,
-  },
-  description:
-    "Backend-focused engineer: distributed systems, high-scale services, Kafka pipelines, migrations, and performance work grounded in profiling and databases.",
-  keywords: [
-    "backend engineer",
-    "distributed systems",
-    "Go",
-    "Kafka",
-    "PostgreSQL",
-    "site reliability",
-    "Park+",
-  ],
-  authors: [{ name: site.name }],
-  openGraph: {
-    title: `${site.name} — ${site.focus}`,
-    description:
-      "Portfolio: systems design, production backend work, and engineering notes.",
-    url: site.url,
-    siteName: site.name,
-    locale: "en_US",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${site.name} — Backend / Systems`,
-    description:
-      "Backend-focused engineer — scale, migrations, events, and performance.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { site } = await getPageData();
 
-export default function RootLayout({
+  return {
+    metadataBase: getMetadataBase(),
+    title: {
+      default: `${site.name} — ${site.focus}`,
+      template: `%s — ${site.name}`,
+    },
+    description:
+      "Backend-focused engineer: distributed systems, high-scale services, Kafka pipelines, migrations, and performance work grounded in profiling and databases.",
+    keywords: [
+      "backend engineer",
+      "distributed systems",
+      "Go",
+      "Kafka",
+      "PostgreSQL",
+      "site reliability",
+      "Park+",
+    ],
+    authors: [{ name: site.name }],
+    openGraph: {
+      title: `${site.name} — ${site.focus}`,
+      description:
+        "Portfolio: systems design, production backend work, and engineering notes.",
+      url: site.url,
+      siteName: site.name,
+      locale: "en_US",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${site.name} — Backend / Systems`,
+      description:
+        "Backend-focused engineer — scale, migrations, events, and performance.",
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { site } = await getPageData();
+
   return (
     <html lang="en" className="dark">
       <body
@@ -81,7 +87,7 @@ export default function RootLayout({
         </a>
         <SiteHeader />
         <main id="main-content">{children}</main>
-        <SiteFooter />
+        <SiteFooter site={site} />
       </body>
     </html>
   );

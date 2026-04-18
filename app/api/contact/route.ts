@@ -23,9 +23,13 @@ export async function POST(req: Request) {
   }
 
   const { name, email, message } = parsed.data;
-  const key = process.env.RESEND_API_KEY;
-  const from = process.env.CONTACT_FROM;
-  const to = process.env.CONTACT_TO;
+  const key = process.env.RESEND_API_KEY?.trim();
+  const from = process.env.CONTACT_FROM?.trim();
+  const to = process.env.CONTACT_TO?.trim();
+
+  const bodyText = [`From: ${name}`, `Reply-To: ${email}`, "", message].join(
+    "\n",
+  );
 
   if (key && from && to) {
     const res = await fetch("https://api.resend.com/emails", {
@@ -39,7 +43,7 @@ export async function POST(req: Request) {
         to: [to],
         subject: `[Portfolio] Message from ${name}`,
         reply_to: email,
-        text: message,
+        text: bodyText,
       }),
     });
 

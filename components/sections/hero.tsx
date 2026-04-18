@@ -3,9 +3,9 @@
 import { motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 
-import { site } from "@/content/site";
+import type { SiteDTO } from "@/lib/page-types";
 
-export function Hero() {
+export function Hero({ site }: { site: SiteDTO }) {
   const reduce = useReducedMotion();
 
   return (

@@ -1,8 +1,12 @@
 import { Reveal } from "@/components/motion/reveal";
 import { Section } from "@/components/ui/section";
-import { achievements } from "@/content/achievements";
+import type { AchievementDTO } from "@/lib/page-types";
 
-export function Achievements() {
+export function Achievements({
+  achievements,
+}: {
+  achievements: AchievementDTO[];
+}) {
   return (
     <Section
       id="achievements"
@@ -12,7 +16,7 @@ export function Achievements() {
     >
       <div className="grid gap-5 md:grid-cols-3">
         {achievements.map((a, i) => (
-          <Reveal key={a.title} delay={i * 0.07}>
+          <Reveal key={`${a.title}-${i}`} delay={i * 0.07}>
             <div className="relative overflow-hidden rounded-2xl border border-zinc-800/90 bg-gradient-to-br from-emerald-950/35 via-zinc-950/40 to-zinc-950 p-6">
               <div
                 aria-hidden

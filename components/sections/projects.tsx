@@ -2,9 +2,9 @@ import Link from "next/link";
 
 import { Reveal } from "@/components/motion/reveal";
 import { Section } from "@/components/ui/section";
-import { projects } from "@/content/projects";
+import type { ProjectDTO } from "@/lib/page-types";
 
-export function Projects() {
+export function Projects({ projects }: { projects: ProjectDTO[] }) {
   return (
     <Section
       id="projects"

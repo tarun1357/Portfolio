@@ -2,7 +2,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { site } from "@/content/site";
+import { getPageData } from "@/lib/page-data";
 import { getAllPosts, getPostBySlug, getPostSlugs } from "@/lib/posts";
 import type { Metadata } from "next";
 
@@ -16,7 +16,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const { slug } = await props.params;
   const post = getPostBySlug(slug);
   if (!post) return {};
+
+  const { site } = await getPageData();
   const url = `${site.url}/blog/${slug}`;
+
   return {
     title: post.meta.title,
     description: post.meta.description,

@@ -1,8 +1,8 @@
 import Link from "next/link";
 
-import { site } from "@/content/site";
+import type { SiteDTO } from "@/lib/page-types";
 
-export function SiteFooter() {
+export function SiteFooter({ site }: { site: SiteDTO }) {
   return (
     <footer className="border-t border-zinc-800/80 py-12">
       <div className="mx-auto flex max-w-5xl flex-col gap-6 px-6 sm:flex-row sm:items-center sm:justify-between">

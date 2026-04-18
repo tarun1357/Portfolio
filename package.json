@@ -8,13 +8,30 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "postinstall": "prisma generate",
+    "db:migrate": "node scripts/exec-with-prisma-env.mjs npx prisma migrate deploy",
+    "db:push": "node scripts/exec-with-prisma-env.mjs npx prisma db push",
+    "db:seed": "node scripts/exec-with-prisma-env.mjs npx tsx prisma/seed.ts",
+    "db:studio": "node scripts/exec-with-prisma-env.mjs npx prisma studio",
+    "verify:parity": "node scripts/exec-with-prisma-env.mjs npx tsx scripts/verify-parity.ts",
+    "certs:rds-ca": "node scripts/fetch-rds-ca.mjs",
+    "db:ping": "tsx scripts/db-ping.ts"
+  },
+  "prisma": {
+    "seed": "node scripts/exec-with-prisma-env.mjs npx tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "@tailwindcss/typography": "^0.5.19",
     "framer-motion": "^12.23.26",
+    "gray-matter": "^4.0.3",
+    "lucide-react": "^1.8.0",
     "next": "^15.3.5",
+    "next-mdx-remote": "^6.0.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
@@ -22,13 +39,17 @@
     "@types/node": "^22.15.21",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
+    "dotenv": "^17.4.2",
     "eslint": "^9.27.0",
     "eslint-config-next": "^15.3.5",
     "eslint-config-prettier": "^10.1.5",
+    "mysql2": "^3.22.1",
     "postcss": "^8.5.4",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
+    "prisma": "^5.22.0",
     "tailwindcss": "^4.1.11",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.3"
   }
 }
