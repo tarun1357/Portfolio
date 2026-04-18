@@ -1,0 +1,17 @@
+---
+title: "Reliable hot paths under variable load"
+date: "2026-03-14"
+description: "Notes on profiling, caching, and protecting databases when spikes are normal—not exceptional."
+---
+
+Most backend incidents look boring in hindsight: a queue backed up, a cache turned into a RPC fan-out, or a query plan flipped because statistics drifted.
+
+When traffic is spikey, I reach for three anchors:
+
+1. **Measure before reshaping** — `pprof` (or your runtime’s equivalent), slow query logs, and saturation signals tell you whether you’re CPU-bound, IO-bound, or coordination-bound.
+
+2. **Caches need an invalidation story** — TTL alone is not a design; neither is “we’ll purge manually.” Pair caches with explicit domains and metrics that prove hit ratio *and* staleness tolerance.
+
+3. **Protect the database** — bulkheads: rate limits, bounded pools, batching, and sometimes dropping work deliberately rather than taking everything down.
+
+These are boring tools. That’s why they work in production.

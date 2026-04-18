@@ -1,0 +1,15 @@
+---
+title: "Kafka ops that backend engineers actually feel"
+date: "2026-02-02"
+description: "Consumer lag, poison messages, and the operational glue that keeps event pipelines trustworthy."
+---
+
+Kafka is easy to demo and hard to run for years.
+
+What separates a toy pipeline from a production one is operational clarity:
+
+- **Consumer lag** is a feature metric—alert on growth rate, not only absolute value.
+- **Poison messages** need a policy: DLQ, quarantine topic, or replay with fixes—pick one explicitly.
+- **Producer contracts** evolve; compatibility is a team sport between services and schema discipline.
+
+If your only success criterion is “messages arrived,” you’ll learn the hard way that *arrived* is not the same as *processed correctly*.
