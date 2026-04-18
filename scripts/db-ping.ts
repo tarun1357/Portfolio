@@ -6,6 +6,7 @@ import "dotenv/config";
 
 import fs from "fs";
 import path from "path";
+import type { RowDataPacket } from "mysql2";
 import mysql from "mysql2/promise";
 
 function parseMysqlUrl(raw: string) {
@@ -70,7 +71,7 @@ async function main() {
       ...baseConfig,
       ...(database ? { database } : {}),
     });
-    const [rows] = await conn.query<Array<{ v: number }>>("SELECT 1 AS v");
+    const [rows] = await conn.query<RowDataPacket[]>("SELECT 1 AS v");
     await conn.end();
     console.log("OK — mysql2 connected:", rows);
   } catch (e: unknown) {
