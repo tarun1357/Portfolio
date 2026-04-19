@@ -5,7 +5,13 @@ import { buildStaticPageData } from "@/lib/static-page-data";
 
 /** Used by `npm run verify:parity` after migrate + seed; not needed at runtime. */
 export async function loadPageFromDatabase(): Promise<PageData> {
-  const profile = await prisma.siteProfile.findUnique({ where: { id: 1 } });
+  const profile = await prisma.siteProfile.findUnique({
+    where: { id: 1 },
+    include: {
+      aboutPillars: { orderBy: { sortOrder: "asc" } },
+      educationEntries: { orderBy: { sortOrder: "asc" } },
+    },
+  });
   if (!profile) throw new Error("site_profile row missing (run prisma db seed)");
 
   const [stackGroups, roles, projects, systemCards, achievementRows] =
@@ -51,8 +57,27 @@ export async function loadPageFromDatabase(): Promise<PageData> {
     },
   };
 
+  const about = {
+    eyebrow: profile.aboutEyebrow,
+    title: profile.aboutTitle,
+    description: profile.aboutDescription,
+    pillars: profile.aboutPillars.map((p) => ({
+      label: p.label,
+      body: p.body,
+    })),
+  };
+
+  const education = profile.educationEntries.map((e) => ({
+    institution: e.institution,
+    degree: e.degree,
+    period: e.period,
+    detail: e.detail,
+  }));
+
   return {
     site,
+    about,
+    education,
     experience: roles.map((r) => ({
       company: r.company,
       title: r.title,

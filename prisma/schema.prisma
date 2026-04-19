@@ -23,9 +23,41 @@ model SiteProfile {
   /// Facts for the Gemini-powered “Ask about me” widget (editable in DB).
   chatContext  String? @map("chat_context") @db.Text
 
+  aboutEyebrow     String @default("About") @map("about_eyebrow") @db.VarChar(191)
+  aboutTitle       String @map("about_title") @db.VarChar(512)
+  aboutDescription String @map("about_description") @db.Text
+
   unansweredQuestions UnansweredChatQuestion[]
+  aboutPillars          AboutPillar[]
+  educationEntries      EducationEntry[]
 
   @@map("site_profile")
+}
+
+model AboutPillar {
+  id            Int         @id @default(autoincrement())
+  siteProfileId Int         @default(1) @map("site_profile_id")
+  siteProfile   SiteProfile @relation(fields: [siteProfileId], references: [id], onDelete: Cascade)
+  label         String      @db.VarChar(128)
+  body          String      @db.Text
+  sortOrder     Int         @map("sort_order")
+
+  @@index([siteProfileId])
+  @@map("about_pillar")
+}
+
+model EducationEntry {
+  id            Int         @id @default(autoincrement())
+  siteProfileId Int         @default(1) @map("site_profile_id")
+  siteProfile   SiteProfile @relation(fields: [siteProfileId], references: [id], onDelete: Cascade)
+  institution   String      @db.VarChar(512)
+  degree        String      @db.VarChar(512)
+  period        String      @db.VarChar(255)
+  detail        String      @db.Text
+  sortOrder     Int         @map("sort_order")
+
+  @@index([siteProfileId])
+  @@map("education_entry")
 }
 
 /// Visitor questions the chatbot could not answer from `chat_context` (for your review).

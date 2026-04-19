@@ -1,61 +1,33 @@
 /**
- * Seeds MySQL from legacy `content/*.ts` — run after migrate (`npm run db:seed`).
+ * Restore experience, projects, stack, system-design, and achievements from `content/*.ts`
+ * without deleting `site_profile` (hero, chat context, about pillars, education, unanswered Qs).
+ *
+ * Run: npm run db:restore-content
  */
 import "dotenv/config";
 
-import { CHAT_BOT_CONTEXT } from "../content/ai-context";
-import { aboutSection } from "../content/about";
 import { achievements } from "../content/achievements";
 import { experience } from "../content/experience";
 import { projects } from "../content/projects";
-import { site } from "../content/site";
 import { stackGroups } from "../content/stack";
 import { systemDesignHighlights } from "../content/system-design";
 import { prisma } from "../lib/prisma";
 
 const STACK_ICON_KEYS = ["code2", "servercog", "cloud", "wrench"] as const;
 
-async function clearContent() {
-  await prisma.highlightMetric.deleteMany();
-  await prisma.experienceHighlight.deleteMany();
-  await prisma.experienceRole.deleteMany();
-  await prisma.projectStackTag.deleteMany();
-  await prisma.projectImpactLine.deleteMany();
-  await prisma.projectLink.deleteMany();
-  await prisma.project.deleteMany();
-  await prisma.stackItem.deleteMany();
-  await prisma.stackGroup.deleteMany();
-  await prisma.systemDesignCard.deleteMany();
-  await prisma.achievement.deleteMany();
-  await prisma.siteProfile.deleteMany();
-}
-
 async function main() {
-  await clearContent();
-
-  await prisma.siteProfile.create({
-    data: {
-      id: 1,
-      name: site.name,
-      role: site.role,
-      focus: site.focus,
-      heroHeadline: site.hero.headline,
-      heroSub: site.hero.sub,
-      githubUrl: site.links.github,
-      linkedinUrl: site.links.linkedin,
-      emailMailto: site.links.email,
-      chatContext: CHAT_BOT_CONTEXT,
-      aboutEyebrow: aboutSection.eyebrow,
-      aboutTitle: aboutSection.title,
-      aboutDescription: aboutSection.description,
-      aboutPillars: {
-        create: aboutSection.pillars.map((p, i) => ({
-          label: p.label,
-          body: p.body,
-          sortOrder: i,
-        })),
-      },
-    },
+  await prisma.$transaction(async (tx) => {
+    await tx.highlightMetric.deleteMany();
+    await tx.experienceHighlight.deleteMany();
+    await tx.experienceRole.deleteMany();
+    await tx.projectStackTag.deleteMany();
+    await tx.projectImpactLine.deleteMany();
+    await tx.projectLink.deleteMany();
+    await tx.project.deleteMany();
+    await tx.stackItem.deleteMany();
+    await tx.stackGroup.deleteMany();
+    await tx.systemDesignCard.deleteMany();
+    await tx.achievement.deleteMany();
   });
 
   for (let gi = 0; gi < stackGroups.length; gi++) {
@@ -92,14 +64,15 @@ async function main() {
             title: h.title,
             detail: h.detail,
             sortOrder: hi,
-            metrics: h.metrics
-              ? {
-                  create: h.metrics.map((text, mi) => ({
-                    text,
-                    sortOrder: mi,
-                  })),
-                }
-              : undefined,
+            metrics:
+              h.metrics && h.metrics.length > 0
+                ? {
+                    create: h.metrics.map((text, mi) => ({
+                      text,
+                      sortOrder: mi,
+                    })),
+                  }
+                : undefined,
           })),
         },
       },
@@ -160,7 +133,9 @@ async function main() {
     });
   }
 
-  console.log("Seed completed.");
+  console.log(
+    "Restored stack, experience, projects, system-design, achievements from content/*.ts (site_profile unchanged).",
+  );
 }
 
 main()

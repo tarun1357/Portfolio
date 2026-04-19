@@ -1,6 +1,7 @@
 import { Achievements } from "@/components/sections/achievements";
 import { About } from "@/components/sections/about";
 import { Contact } from "@/components/sections/contact";
+import { Education } from "@/components/sections/education";
 import { Experience } from "@/components/sections/experience";
 import { Hero } from "@/components/sections/hero";
 import { Projects } from "@/components/sections/projects";
@@ -15,7 +16,8 @@ export default async function Home() {
   return (
     <>
       <Hero site={data.site} />
-      <About />
+      <About data={data.about} />
+      <Education entries={data.education} />
       {primaryRole ? <Experience role={primaryRole} /> : null}
       <SystemDesignSection cards={data.systemDesign} />
       <Projects projects={data.projects} />

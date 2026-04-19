@@ -1,4 +1,6 @@
+import { aboutSection } from "@/content/about";
 import { achievements } from "@/content/achievements";
+import { educationEntries } from "@/content/education";
 import { experience } from "@/content/experience";
 import { projects } from "@/content/projects";
 import { site as siteContent } from "@/content/site";
@@ -21,6 +23,21 @@ export function buildStaticPageData(): PageData {
       links: { ...siteContent.links },
       hero: { ...siteContent.hero },
     },
+    about: {
+      eyebrow: aboutSection.eyebrow,
+      title: aboutSection.title,
+      description: aboutSection.description,
+      pillars: aboutSection.pillars.map((p) => ({
+        label: p.label,
+        body: p.body,
+      })),
+    },
+    education: educationEntries.map((e) => ({
+      institution: e.institution,
+      degree: e.degree,
+      period: e.period,
+      detail: e.detail,
+    })),
     experience: experience.map((role) => ({
       company: role.company,
       title: role.title,

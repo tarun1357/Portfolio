@@ -76,7 +76,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { site } = await getPageData();
+  const data = await getPageData();
+  const { site } = data;
+  const focusHint =
+    site.focus.split("·")[0]?.trim().toLowerCase() ?? "portfolio";
 
   return (
     <html lang="en" className="dark">
@@ -89,7 +92,11 @@ export default async function RootLayout({
         >
           Skip to content
         </a>
-        <SiteHeader />
+        <SiteHeader
+          siteName={site.name}
+          focusHint={focusHint}
+          showEducation={data.education.length > 0}
+        />
         <main id="main-content">{children}</main>
         <SiteFooter site={site} />
         <PortfolioChat />

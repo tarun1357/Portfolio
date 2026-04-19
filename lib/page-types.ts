@@ -63,8 +63,29 @@ export type AchievementDTO = {
   tone: string;
 };
 
+export type AboutPillarDTO = {
+  label: string;
+  body: string;
+};
+
+export type AboutDTO = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  pillars: AboutPillarDTO[];
+};
+
+export type EducationEntryDTO = {
+  institution: string;
+  degree: string;
+  period: string;
+  detail: string;
+};
+
 export type PageData = {
   site: SiteDTO;
+  about: AboutDTO;
+  education: EducationEntryDTO[];
   experience: ExperienceRoleDTO[];
   projects: ProjectDTO[];
   stackGroups: StackGroupDTO[];
