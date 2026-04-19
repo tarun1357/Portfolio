@@ -20,8 +20,24 @@ model SiteProfile {
   githubUrl    String @map("github_url") @db.VarChar(512)
   linkedinUrl  String @map("linkedin_url") @db.VarChar(512)
   emailMailto  String @map("email_mailto") @db.VarChar(512)
+  /// Facts for the Gemini-powered “Ask about me” widget (editable in DB).
+  chatContext  String? @map("chat_context") @db.Text
+
+  unansweredQuestions UnansweredChatQuestion[]
 
   @@map("site_profile")
+}
+
+/// Visitor questions the chatbot could not answer from `chat_context` (for your review).
+model UnansweredChatQuestion {
+  id            Int         @id @default(autoincrement())
+  siteProfileId Int         @map("site_profile_id")
+  siteProfile   SiteProfile @relation(fields: [siteProfileId], references: [id], onDelete: Cascade)
+  questionText  String      @map("question_text") @db.Text
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  @@index([siteProfileId])
+  @@map("unanswered_chat_question")
 }
 
 model StackGroup {

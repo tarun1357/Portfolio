@@ -9,3 +9,13 @@ export const contactSchema = z.object({
 });
 
 export type ContactInput = z.infer<typeof contactSchema>;
+
+export const chatMessageSchema = z.object({
+  message: z
+    .string()
+    .trim()
+    .min(2, "Please enter at least 2 characters")
+    .max(2000, "Please keep your question under 2000 characters"),
+});
+
+export type ChatMessageInput = z.infer<typeof chatMessageSchema>;

@@ -3,6 +3,7 @@
  */
 import "dotenv/config";
 
+import { CHAT_BOT_CONTEXT } from "../content/ai-context";
 import { achievements } from "../content/achievements";
 import { experience } from "../content/experience";
 import { projects } from "../content/projects";
@@ -42,6 +43,7 @@ async function main() {
       githubUrl: site.links.github,
       linkedinUrl: site.links.linkedin,
       emailMailto: site.links.email,
+      chatContext: CHAT_BOT_CONTEXT,
     },
   });
 

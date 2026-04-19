@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { PortfolioChat } from "@/components/portfolio-chat";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getPageData } from "@/lib/page-data";
@@ -91,6 +92,7 @@ export default async function RootLayout({
         <SiteHeader />
         <main id="main-content">{children}</main>
         <SiteFooter site={site} />
+        <PortfolioChat />
       </body>
     </html>
   );
