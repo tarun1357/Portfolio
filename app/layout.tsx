@@ -18,6 +18,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+/** Fresh DB-backed header/footer + metadata on every navigation (no ISR snapshot). */
+export const dynamic = "force-dynamic";
+
 export const viewport: Viewport = {
   themeColor: "#09090b",
   width: "device-width",

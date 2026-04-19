@@ -8,8 +8,6 @@ import { Stack } from "@/components/sections/stack";
 import { SystemDesignSection } from "@/components/sections/system-design";
 import { getPageData } from "@/lib/page-data";
 
-export const revalidate = 60;
-
 export default async function Home() {
   const data = await getPageData();
   const primaryRole = data.experience[0];

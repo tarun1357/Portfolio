@@ -1,5 +1,3 @@
-import { unstable_cache } from "next/cache";
-
 import type { PageData, SiteDTO } from "@/lib/page-types";
 import { prisma } from "@/lib/prisma";
 import { resolveSiteUrl } from "@/lib/site-url";
@@ -103,7 +101,8 @@ function shouldQueryDatabase(): boolean {
   return true;
 }
 
-async function loadPageDataUncached(): Promise<PageData> {
+/** Portfolio document for RSC + APIs — loads from Prisma on every request (no Data Cache). */
+export async function getPageData(): Promise<PageData> {
   if (!shouldQueryDatabase()) {
     return buildStaticPageData();
   }
@@ -114,9 +113,3 @@ async function loadPageDataUncached(): Promise<PageData> {
     return buildStaticPageData();
   }
 }
-
-/** Cached portfolio document for RSC + metadata (revalidate: 60s). */
-export const getPageData = unstable_cache(loadPageDataUncached, ["portfolio-page-v1"], {
-  revalidate: 60,
-  tags: ["portfolio"],
-});

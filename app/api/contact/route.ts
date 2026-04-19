@@ -2,6 +2,36 @@ import { NextResponse } from "next/server";
 
 import { contactSchema } from "@/lib/validations";
 
+export const runtime = "nodejs";
+
+function userFacingResendMessage(status: number, bodyText: string): string {
+  try {
+    const j = JSON.parse(bodyText) as { message?: string };
+    const msg = j.message ?? "";
+    if (
+      status === 403 &&
+      msg.toLowerCase().includes("verify a domain")
+    ) {
+      return "Email sending isn’t set up for this site yet (verify your domain in Resend and use that domain in CONTACT_FROM).";
+    }
+    if (
+      status === 403 &&
+      msg.toLowerCase().includes("only send testing emails")
+    ) {
+      return "Resend is in testing mode: messages can only go to your Resend account email until you verify a domain.";
+    }
+    if (status === 422 || status === 400) {
+      return "Invalid sender or recipient configuration. Check CONTACT_FROM and CONTACT_TO in your deployment.";
+    }
+    if (status === 401) {
+      return "Email service rejected the API key (check RESEND_API_KEY on the server).";
+    }
+  } catch {
+    /* ignore JSON parse */
+  }
+  return "Could not deliver message right now.";
+}
+
 export async function POST(req: Request) {
   let json: unknown;
   try {
@@ -31,36 +61,49 @@ export async function POST(req: Request) {
     "\n",
   );
 
-  if (key && from && to) {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from,
-        to: [to],
-        subject: `[Portfolio] Message from ${name}`,
-        reply_to: email,
-        text: bodyText,
-      }),
-    });
-
-    if (!res.ok) {
-      const errText = await res.text().catch(() => "");
-      console.error("[contact] Resend error", res.status, errText);
+  const configured = Boolean(key && from && to);
+  if (!configured) {
+    const isProd = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+    if (isProd && process.env.VERCEL) {
+      console.error("[contact] Missing RESEND_API_KEY, CONTACT_FROM, or CONTACT_TO in production.");
       return NextResponse.json(
-        { error: "Could not deliver message right now." },
-        { status: 502 },
+        {
+          error:
+            "Contact form is not configured on this deployment (set RESEND_API_KEY, CONTACT_FROM, CONTACT_TO for Production).",
+        },
+        { status: 503 },
       );
     }
-  } else {
     console.info("[contact] dev delivery (configure RESEND)", {
       name,
       email,
       messagePreview: message.slice(0, 160),
     });
+    return NextResponse.json({ ok: true });
+  }
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${key}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from,
+      to: [to],
+      subject: `[Portfolio] Message from ${name}`,
+      reply_to: email,
+      text: bodyText,
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text().catch(() => "");
+    console.error("[contact] Resend error", res.status, errText);
+    return NextResponse.json(
+      { error: userFacingResendMessage(res.status, errText) },
+      { status: 502 },
+    );
   }
 
   return NextResponse.json({ ok: true });

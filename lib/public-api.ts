@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
-/** Shared cache policy for read-only public portfolio JSON (matches `/api/public/page`). */
+/** Avoid edge/browser caching stale portfolio JSON — same freshness as DB-backed pages. */
 export const PUBLIC_JSON_HEADERS = {
-  "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+  "Cache-Control": "private, no-store",
 } as const;
 
 export function jsonPublic(body: unknown) {
