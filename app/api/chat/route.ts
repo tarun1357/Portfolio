@@ -6,18 +6,23 @@ import {
   DEFAULT_GEMINI_MODEL,
   generateGeminiReply,
 } from "@/lib/gemini-chat";
+import { generateNvidiaReply } from "@/lib/nvidia-chat";
 import { prisma } from "@/lib/prisma";
 import { chatMessageSchema } from "@/lib/validations";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  const geminiKey = process.env.GEMINI_API_KEY?.trim();
+  const nvidiaKey = process.env.NVIDIA_API_KEY?.trim();
   const model = process.env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL;
 
-  if (!apiKey) {
+  if (!geminiKey && !nvidiaKey) {
     return NextResponse.json(
-      { error: "Chat assistant is not configured (missing GEMINI_API_KEY)." },
+      {
+        error:
+          "Chat assistant is not configured (missing both GEMINI_API_KEY and NVIDIA_API_KEY).",
+      },
       { status: 503 },
     );
   }
@@ -57,15 +62,35 @@ export async function POST(req: Request) {
     verifiedContext,
   );
 
-  const result = await generateGeminiReply({
-    apiKey,
-    model,
-    systemPrompt,
-    userMessage: message,
-  });
+  /* ---- Primary: Gemini -------------------------------------------------- */
+  let result = geminiKey
+    ? await generateGeminiReply({
+        apiKey: geminiKey,
+        model,
+        systemPrompt,
+        userMessage: message,
+      })
+    : null;
 
-  if (!result.ok) {
-    return NextResponse.json({ error: result.error }, { status: 502 });
+  /* ---- Fallback: NVIDIA NIM (Gemma 4 31B) ------------------------------- */
+  if ((!result || !result.ok) && nvidiaKey) {
+    console.warn(
+      "[chat] Gemini unavailable — falling back to NVIDIA",
+      result && !result.ok ? result.error : "(no Gemini key)",
+    );
+    result = await generateNvidiaReply({
+      apiKey: nvidiaKey,
+      systemPrompt,
+      userMessage: message,
+    });
+  }
+
+  if (!result || !result.ok) {
+    const error =
+      result && !result.ok
+        ? result.error
+        : "Chat assistant is unavailable.";
+    return NextResponse.json({ error }, { status: 502 });
   }
 
   const siteProfileId = profile?.id ?? 1;
