@@ -103,10 +103,6 @@ export type GeminiGenerateResult =
 /** Tried after your `GEMINI_MODEL` (deduped) — newer IDs first; Google rotates availability by key/region. */
 const MODEL_FALLBACK_CHAIN = [
   "gemini-3-flash-preview",
-  "gemini-2.0-flash",
-  "gemini-2.5-flash-lite",
-  "gemini-2.5-flash",
-  "gemini-1.5-flash",
 ] as const;
 
 function uniqueModelChain(preferred: string): string[] {
